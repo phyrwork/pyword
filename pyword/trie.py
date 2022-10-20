@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import suppress
-from typing import Dict, Iterator, Mapping, MutableSet, Tuple
+from typing import Dict, Iterable, Iterator, Mapping, MutableSet, Tuple
 
 
 class Trie(MutableSet[str]):
@@ -72,3 +72,10 @@ class Trie(MutableSet[str]):
 
     __iter__ = keys
     __len__ = len
+
+    @classmethod
+    def from_keys(cls, keys: Iterable[str]) -> Trie:
+        tr = Trie()
+        for key in keys:
+            tr.add(key)
+        return tr
