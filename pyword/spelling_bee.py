@@ -1,4 +1,7 @@
-from typing import Iterable, Iterator, List, Tuple
+import sys
+from typing import Iterable, Iterator, List, Optional, TextIO, Tuple
+
+import click
 
 from .trie import Trie
 
@@ -47,3 +50,40 @@ def solve(
         for c in optional:
             if (v := u.next.get(c)) is not None:
                 s.append((w + c, v))
+
+
+def iter_strip(it: Iterable[str]) -> Iterator[str]:
+    for s in it:
+        yield s.strip()
+
+
+@click.command()
+@click.option("--dictionary", "-d", type=click.File("r"), envvar="PYWORD_DICTIONARY")
+@click.argument("optional", type=str)
+@click.argument("required", type=str, default="")
+def cli(dictionary: Optional[TextIO], optional: str, required: str) -> None:
+    if dictionary is None:
+        raise Exception("no dictionary provided")
+
+    print("loading dictionary...", end="", file=sys.stderr, flush=True)
+    dct = Trie.from_keys(iter_strip(dictionary))
+    print(f" ok ({len(dct)} words, {dct.size()} nodes)", file=sys.stderr, flush=True)
+
+    result = sorted(
+        solve(
+            dct,
+            optional,
+            required,
+        ),
+        key=lambda item: item[1],
+        reverse=True,
+    )
+
+    for word, score in result:
+        print(word, score)
+
+    print(f"({len(result)} words, {sum(score for _, score in result)} points)")
+
+
+if __name__ == "__main__":
+    cli()
