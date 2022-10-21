@@ -1,4 +1,6 @@
-from typing import Dict, Iterator, MutableMapping, Tuple
+from typing import Dict, Iterable, Iterator, List, MutableMapping, Tuple
+
+from .trie import Trie
 
 
 class Grid(MutableMapping[Tuple[int, int], str]):
@@ -40,3 +42,26 @@ class Grid(MutableMapping[Tuple[int, int], str]):
             a = to[0] + o[0], to[1] + o[1]
             if 0 <= a[0] < self.size[0] and 0 <= a[1] < self.size[1]:
                 yield a, self[a]
+
+
+Path = Tuple[Tuple[int, int], ...]
+
+
+def solve(dct: Iterable[str], g: Grid) -> Iterator[Tuple[str, Path, int]]:
+    if not isinstance(dct, Trie):
+        dct = Trie.from_keys(dct)
+
+    # Seed search with words starting with chars at each grid position.
+    s: List[Tuple[Path, Trie]] = [
+        ((c,), u) for c in g if (u := dct.next.get(g[c])) is not None
+    ]
+    while s:
+        p, u = s.pop()
+        # Solution if is a word.
+        if u.ok:
+            # Extract word from grid using path.
+            yield "".join(g[c] for c in p), p, 0  # TODO: score
+        # Extend search with next chars from unused adjacent.
+        for c, w in g.adj(p[-1]):
+            if c not in p and (v := u.next.get(w)) is not None:
+                s.append(((*p, c), v))

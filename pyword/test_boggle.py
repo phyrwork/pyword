@@ -1,17 +1,27 @@
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, Iterable, Sequence, Set, Tuple
 
 from pytest import mark, param
 
-from .boggle import Grid
+from .boggle import Grid, Path, solve
+
+KeyCharFunc = Callable[[Tuple[int, int]], str]
 
 
 def key_to_char(k: Tuple[int, int]) -> str:
     return f"{k[0]}.{k[1]}"
 
 
+def unpack_sequences(g: Sequence[Sequence[str]]) -> KeyCharFunc:
+    def char(k: Tuple[int, int]) -> str:
+        x, y = k
+        return g[y][x]
+
+    return char
+
+
 def init_grid(
     size: Tuple[int, int] = (4, 4),
-    chars: Callable[[Tuple[int, int]], str] = key_to_char,
+    chars: KeyCharFunc = key_to_char,
 ):
     g = Grid(size)
     for k in g:
@@ -111,3 +121,36 @@ class TestGrid:
         self, g: Grid, to: Tuple[int, int], want: Dict[Tuple[int, int], str]
     ) -> None:
         assert dict(g.adj(to)) == want
+
+
+@mark.parametrize(
+    ["dct", "g", "want"],
+    [
+        param(
+            ["dog", "dig", "dug"],
+            init_grid(
+                size=(4, 4),
+                chars=unpack_sequences(
+                    [
+                        ["d", "o", "g", "i"],
+                        ["i", "u", "g", "i"],
+                        ["i", "i", "i", "i"],
+                        ["d", "g", "i", "i"],
+                    ]
+                ),
+            ),
+            {
+                ("dog", ((0, 0), (1, 0), (2, 0)), 0),
+                ("dog", ((0, 0), (1, 0), (2, 1)), 0),
+                ("dug", ((0, 0), (1, 1), (2, 1)), 0),
+                ("dug", ((0, 0), (1, 1), (2, 0)), 0),
+                ("dig", ((0, 3), (0, 2), (1, 3)), 0),
+                ("dig", ((0, 3), (1, 2), (1, 3)), 0),
+                ("dig", ((0, 3), (1, 2), (2, 1)), 0),
+            },
+            id="repeat",
+        ),
+    ],
+)
+def test_solve(dct: Iterable[str], g: Grid, want: Set[Tuple[str, Path, int]]) -> None:
+    assert set(solve(dct, g)) == want
