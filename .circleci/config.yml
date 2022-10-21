@@ -3,6 +3,7 @@ orbs:
   python: circleci/python@2.1.1
 jobs:
   build:
+    resource_class: small
     executor: python/default
     steps:
       - checkout
