@@ -1,0 +1,28 @@
+version: '2.1'
+orbs:
+  python: circleci/python@2.1.1
+jobs:
+  build:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: poetry
+      - run:
+          command: |
+            poetry run pytest pyword
+          name: Run tests
+      - run:
+          command: |
+            poetry run flake8
+            poetry run black --check --diff --color .
+            poetry run isort --check --diff --color .
+          name: Check the code style
+      - run:
+          command: |
+            poetry run mypy -p pyword
+          name: Type check the code
+workflows:
+  main:
+    jobs:
+      - build
