@@ -1,4 +1,16 @@
-from typing import Dict, Iterable, Iterator, List, MutableMapping, Tuple
+import sys
+from typing import (
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    MutableMapping,
+    Optional,
+    TextIO,
+    Tuple,
+)
+
+import click
 
 from .trie import Trie
 
@@ -47,7 +59,7 @@ class Grid(MutableMapping[Tuple[int, int], str]):
 Path = Tuple[Tuple[int, int], ...]
 
 
-def solve(dct: Iterable[str], g: Grid) -> Iterator[Tuple[str, Path, int]]:
+def solve(dct: Iterable[str], g: Grid) -> Iterator[Tuple[str, Path]]:
     if not isinstance(dct, Trie):
         dct = Trie.from_keys(dct)
 
@@ -60,8 +72,73 @@ def solve(dct: Iterable[str], g: Grid) -> Iterator[Tuple[str, Path, int]]:
         # Solution if is a word.
         if u.ok:
             # Extract word from grid using path.
-            yield "".join(g[c] for c in p), p, 0  # TODO: score
+            yield "".join(g[c] for c in p), p
         # Extend search with next chars from unused adjacent.
         for c, w in g.adj(p[-1]):
             if c not in p and (v := u.next.get(w)) is not None:
                 s.append(((*p, c), v))
+
+
+def score(w: str) -> int:
+    if len(w) < 3:
+        return 0
+    if len(w) in (3, 4):
+        return 1
+    if len(w) == 5:
+        return 2
+    if len(w) == 6:
+        return 3
+    if len(w) == 7:
+        return 4
+    return 11
+
+
+@click.command()
+@click.option("--dictionary", "-d", type=click.File("r"), envvar="PYWORD_DICTIONARY")
+@click.argument("rows", type=str, nargs=-1)
+def cli(dictionary: Optional[TextIO], rows: List[str]) -> None:
+    if dictionary is None:
+        raise Exception("no dictionary provided")
+    if not rows:
+        raise Exception("no grid provided")
+
+    # Replace Qu with just Q to make this game character compatible with our trie.
+    def strip(w: str) -> str:
+        return w.strip().lower().replace("qu", "q")
+
+    def unstrip(w: str) -> str:
+        return w.replace("q", "qu")
+
+    rows = [strip(row) for row in rows]
+    if len({len(row) for row in rows}) != 1:
+        raise Exception("uneven row sizes")
+    w, h = len(rows[0]), len(rows)
+
+    g = Grid(size=(w, h))
+    for x, y in g:
+        g[x, y] = rows[y][x]
+
+    print("loading dictionary...", end="", file=sys.stderr, flush=True)
+    dct = Trie.from_keys(map(strip, dictionary))
+    print(f" ok ({len(dct)} words, {dct.size()} nodes)", file=sys.stderr, flush=True)
+
+    def process(word: str, path: Path) -> Tuple[str, Path, int]:
+        word = unstrip(word)
+        return word, path, score(word)
+
+    result = sorted(
+        (process(word, path) for word, path in solve(dct, g)),
+        key=lambda item: item[2],
+        reverse=True,
+    )
+
+    for word, path, points in result:
+        print(word, path, points)
+
+    uniques = {(word, points) for word, _, points in result}
+    max_points = sum(points for _, points in uniques)
+    print(f"({len(uniques)} words, {len(result)} paths, {max_points} points)")
+
+
+if __name__ == "__main__":
+    cli()

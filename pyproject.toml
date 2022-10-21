@@ -20,6 +20,7 @@ isort = {version = "^5.10.1", extras = ["colors"]}
 
 [tool.poetry.scripts]
 spelling-bee = "pyword.spelling_bee:cli"
+boggle = "pyword.boggle:cli"
 
 [tool.isort]
 profile = "black"
