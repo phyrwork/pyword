@@ -1,28 +1,24 @@
 from __future__ import annotations
 
 from contextlib import suppress
-from typing import Dict, Iterable, Iterator, Mapping, MutableSet, Tuple
+from typing import Dict, Iterable, Iterator, MutableSet, Tuple
 
 
 class Trie(MutableSet[str]):
     def __init__(self):
         self.ok = False
-        self._next: Dict[str, Trie] = {}
-
-    @property
-    def next(self) -> Mapping[str, Trie]:
-        return self._next
+        self.next: Dict[str, Trie] = {}
 
     def node(self, key: str, create: bool = False) -> Trie:
         u = self
         for i, c in enumerate(key):
             try:
-                v = u._next[c]
+                v = u.next[c]
             except KeyError:
                 if not create:
                     raise KeyError(f"{key}[{i}] not found")
                 v = Trie()
-                u._next[c] = v
+                u.next[c] = v
             u = v
         return u
 
