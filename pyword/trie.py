@@ -22,7 +22,7 @@ class Node(MutableSet[Sequence[H]]):
         self.ok = False
         self.next: Dict[H, Node] = {}
 
-    def node(self, key: Sequence[H], create: bool = False) -> Node[H]:
+    def node(self, key: Iterable[H], create: bool = False) -> Node[H]:
         u = self
         for i, c in enumerate(key):
             try:
@@ -35,14 +35,14 @@ class Node(MutableSet[Sequence[H]]):
             u = v
         return u
 
-    def add(self, key: Sequence[H]) -> None:
+    def add(self, key: Iterable[H]) -> None:
         self.node(key, create=True).ok = True
 
-    def discard(self, key: Sequence[H]) -> None:
+    def discard(self, key: Iterable[H]) -> None:
         with suppress(KeyError):
             self.node(key).ok = False
 
-    def contains(self, key: Sequence[H]) -> bool:
+    def contains(self, key: Iterable[H]) -> bool:
         try:
             return self.node(key).ok
         except KeyError:

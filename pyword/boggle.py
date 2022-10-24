@@ -6,6 +6,22 @@ import click
 from .trie import Node
 
 
+class TokenError(Exception):
+    ...
+
+
+def tokenize(w: str) -> Iterator[str]:
+    it = iter(w)
+    while c := next(it, None):
+        if c == "q":
+            d = next(it, None)
+            if d != "u":
+                raise TokenError(f"impossible token q followed by {d}")
+            yield "qu"
+        else:
+            yield c
+
+
 class Grid(MutableMapping[Tuple[int, int], str]):
     def __init__(self, size: Tuple[int, int] = (4, 4)):
         self.size = size
@@ -50,7 +66,7 @@ class Grid(MutableMapping[Tuple[int, int], str]):
 Path = Tuple[Tuple[int, int], ...]
 
 
-def solve(dct: Node[str], g: Grid) -> Iterator[Tuple[str, Path]]:
+def solve(dct: Node[str], g: Grid) -> Iterator[Tuple[Tuple[str, ...], Path]]:
     # Seed search with words starting with chars at each grid position.
     s: List[Tuple[Path, Node]] = [
         ((c,), u) for c in g if (u := dct.next.get(g[c])) is not None
@@ -60,7 +76,7 @@ def solve(dct: Node[str], g: Grid) -> Iterator[Tuple[str, Path]]:
         # Solution if is a word.
         if u.ok:
             # Extract word from grid using path.
-            yield "".join(g[c] for c in p), p
+            yield tuple(g[c] for c in p), p
         # Extend search with next chars from unused adjacent.
         for c, w in g.adj(p[-1]):
             if c not in p and (v := u.next.get(w)) is not None:
@@ -90,28 +106,39 @@ def cli(dictionary: Optional[TextIO], rows: List[str]) -> None:
     if not rows:
         raise Exception("no grid provided")
 
-    # Replace Qu with just Q to make this game character compatible with our trie.
-    def strip(w: str) -> str:
-        return w.strip().lower().replace("qu", "q")
-
-    def unstrip(w: str) -> str:
-        return w.replace("q", "qu")
-
-    rows = [strip(row) for row in rows]
+    chars = [list(tokenize(row.lower())) for row in rows]
     if len({len(row) for row in rows}) != 1:
         raise Exception("uneven row sizes")
-    w, h = len(rows[0]), len(rows)
+    w, h = len(chars[0]), len(chars)
 
     g = Grid(size=(w, h))
     for x, y in g:
-        g[x, y] = rows[y][x]
+        g[x, y] = chars[y][x]
 
     print("loading dictionary...", end="", file=sys.stderr, flush=True)
-    dct = Node.from_keys(map(strip, dictionary))
-    print(f" ok ({len(dct)} words, {dct.size()} nodes)", file=sys.stderr, flush=True)
+    ignored = 0
+    dct: Node[str] = Node()
+    for word in dictionary:
+        word = word.strip().lower()
+        try:
+            dct.add(tokenize(word))
+        except TokenError:
+            ignored += 1
+            print(
+                f"impossible word {word} ignored ({ignored})",
+                file=sys.stderr,
+                flush=True,
+            )
+    if ignored:
+        print("loading dictionary", end="", file=sys.stderr, flush=True)
+    print(
+        f" ok ({len(dct)} words, {ignored} ignored, {dct.size()} nodes)",
+        file=sys.stderr,
+        flush=True,
+    )
 
-    def process(word: str, path: Path) -> Tuple[str, Path, int]:
-        word = unstrip(word)
+    def process(chars: Tuple[str, ...], path: Path) -> Tuple[str, Path, int]:
+        word = "".join(chars)
         return word, path, score(word)
 
     result = sorted(
