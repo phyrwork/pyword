@@ -3,6 +3,7 @@ from typing import Callable, Dict, Iterable, Sequence, Set, Tuple
 from pytest import mark, param
 
 from .boggle import Grid, Path, solve
+from .trie import Node
 
 KeyCharFunc = Callable[[Tuple[int, int]], str]
 
@@ -153,4 +154,4 @@ class TestGrid:
     ],
 )
 def test_solve(dct: Iterable[str], g: Grid, want: Set[Tuple[str, Path, int]]) -> None:
-    assert set(solve(dct, g)) == want
+    assert set(solve(Node.from_keys(dct), g)) == want

@@ -1,15 +1,28 @@
 from __future__ import annotations
 
 from contextlib import suppress
-from typing import Dict, Iterable, Iterator, MutableSet, Tuple
+from typing import (
+    Dict,
+    Hashable,
+    Iterable,
+    Iterator,
+    List,
+    MutableSet,
+    Sequence,
+    Tuple,
+    Type,
+    TypeVar,
+)
+
+H = TypeVar("H", bound=Hashable)
 
 
-class Trie(MutableSet[str]):
+class Node(MutableSet[Sequence[H]]):
     def __init__(self):
         self.ok = False
-        self.next: Dict[str, Trie] = {}
+        self.next: Dict[H, Node] = {}
 
-    def node(self, key: str, create: bool = False) -> Trie:
+    def node(self, key: Sequence[H], create: bool = False) -> Node[H]:
         u = self
         for i, c in enumerate(key):
             try:
@@ -17,34 +30,34 @@ class Trie(MutableSet[str]):
             except KeyError:
                 if not create:
                     raise KeyError(f"{key}[{i}] not found")
-                v = Trie()
+                v = type(self)()
                 u.next[c] = v
             u = v
         return u
 
-    def add(self, key: str) -> None:
+    def add(self, key: Sequence[H]) -> None:
         self.node(key, create=True).ok = True
 
-    def discard(self, key: str) -> None:
+    def discard(self, key: Sequence[H]) -> None:
         with suppress(KeyError):
             self.node(key).ok = False
 
-    def contains(self, key: str) -> bool:
-        if not isinstance(key, str):
-            return False
+    def contains(self, key: Sequence[H]) -> bool:
         try:
             return self.node(key).ok
         except KeyError:
             return False
 
-    def nodes(self) -> Iterator[Tuple[str, Trie]]:
-        s = list(self.next.items())
+    def nodes(self) -> Iterator[Tuple[Sequence[H], Node[H]]]:
+        s: List[Tuple[Tuple[H, ...], Node[H]]] = [
+            ((c,), u) for c, u in self.next.items()
+        ]
         while s:
             wu = s.pop()
             yield wu
             w, u = wu
             for c, v in u.next.items():
-                s.append((w + c, v))
+                s.append(((*w, c), v))
 
     def size(self) -> int:
         n = 0
@@ -52,7 +65,7 @@ class Trie(MutableSet[str]):
             n += 1
         return n
 
-    def keys(self) -> Iterator[str]:
+    def keys(self) -> Iterator[Sequence[H]]:
         for w, n in self.nodes():
             if n.ok:
                 yield w
@@ -63,15 +76,13 @@ class Trie(MutableSet[str]):
             n += 1
         return n
 
-    def __contains__(self, key: object) -> bool:
-        return isinstance(key, str) and self.contains(key)
-
+    __contains__ = contains  # type: ignore
     __iter__ = keys
     __len__ = len
 
     @classmethod
-    def from_keys(cls, keys: Iterable[str]) -> Trie:
-        tr = Trie()
+    def from_keys(cls: Type[Node[H]], keys: Iterable[Sequence[H]]) -> Node[H]:
+        tr: Node[H] = Node()
         for key in keys:
             tr.add(key)
         return tr

@@ -1,18 +1,9 @@
 import sys
-from typing import (
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    MutableMapping,
-    Optional,
-    TextIO,
-    Tuple,
-)
+from typing import Dict, Iterator, List, MutableMapping, Optional, TextIO, Tuple
 
 import click
 
-from .trie import Trie
+from .trie import Node
 
 
 class Grid(MutableMapping[Tuple[int, int], str]):
@@ -59,12 +50,9 @@ class Grid(MutableMapping[Tuple[int, int], str]):
 Path = Tuple[Tuple[int, int], ...]
 
 
-def solve(dct: Iterable[str], g: Grid) -> Iterator[Tuple[str, Path]]:
-    if not isinstance(dct, Trie):
-        dct = Trie.from_keys(dct)
-
+def solve(dct: Node[str], g: Grid) -> Iterator[Tuple[str, Path]]:
     # Seed search with words starting with chars at each grid position.
-    s: List[Tuple[Path, Trie]] = [
+    s: List[Tuple[Path, Node]] = [
         ((c,), u) for c in g if (u := dct.next.get(g[c])) is not None
     ]
     while s:
@@ -119,7 +107,7 @@ def cli(dictionary: Optional[TextIO], rows: List[str]) -> None:
         g[x, y] = rows[y][x]
 
     print("loading dictionary...", end="", file=sys.stderr, flush=True)
-    dct = Trie.from_keys(map(strip, dictionary))
+    dct = Node.from_keys(map(strip, dictionary))
     print(f" ok ({len(dct)} words, {dct.size()} nodes)", file=sys.stderr, flush=True)
 
     def process(word: str, path: Path) -> Tuple[str, Path, int]:
