@@ -25,6 +25,7 @@ The following solvers are demonstrated:
 |------------------|--------------|--------------------------------------------------------------------------------------------------|
 | Boggle           | boggle       | Arbitrary **N**x**M** size Boggle solver with scoring based on standard (4x4) rules.             |
 | NYT Spelling Bee | spelling-bee | [New York Times Spelling Bee](https://www.nytimes.com/puzzles/spelling-bee) solver with scoring. |
+| Wordiply         | wordiply     | The Guardian [Wordiply](https://www.wordiply.com) solver.                                        |
 
 
 ## Usage
@@ -91,4 +92,24 @@ convinced 13
 codivine 12
 ...
 (86 words, 257 points)
+```
+
+
+### Wordiply
+
+The day's subword is given as the argument.
+
+The letter score is printed after the best 5 discovered words. No length score can be given as the contents of the
+common word dictionary is not known. For example `mitrailleuses` as discovered below was not in the common word list and
+so the length score was >100%.
+
+```shell
+$  wordiply rail                                           
+loading dictionary... ok (194433 words, 447873 nodes)
+mitrailleuses 13
+semitrailers 12
+mitrailleuse 12
+mitrailleurs 12
+engrailments 12
+61
 ```

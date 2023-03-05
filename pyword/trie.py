@@ -59,6 +59,11 @@ class Node(MutableSet[Sequence[H]]):
             for c, v in u.next.items():
                 s.append(((*w, c), v))
 
+    def search(self, key: Sequence[H]) -> Iterator[Tuple[Sequence[H], Node[H]]]:
+        for prefix, node in self.nodes():
+            with suppress(KeyError):
+                yield prefix, node.node(key)
+
     def size(self) -> int:
         n = 0
         for _ in self.nodes():
