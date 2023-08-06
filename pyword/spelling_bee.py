@@ -28,8 +28,12 @@ def solve(
         assert isinstance(required, set)
         if required - c:
             return 0
-        # One point for every char over 3 chars.
-        p = len(w) - 3
+        if len(w) == 4:
+            # 4 chars is worth 1 point.
+            p = 1
+        else:
+            # Otherwise 1 point per char.
+            p = len(w)
         # Bonus points if all optional chars used.
         if not optional - c:
             p += 7

@@ -34,7 +34,7 @@ from .trie import Node
             ["a", "ab", "abc", "abcd", "abcde", "abcdef"],
             "abcdef",
             "a",
-            {"a": 0, "ab": 0, "abc": 0, "abcd": 1, "abcde": 2, "abcdef": 10},
+            {"a": 0, "ab": 0, "abc": 0, "abcd": 1, "abcde": 5, "abcdef": 13},
             id="scoring",
         ),
     ],
