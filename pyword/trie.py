@@ -18,7 +18,7 @@ H = TypeVar("H", bound=Hashable)
 
 
 class Node(MutableSet[Sequence[H]]):
-    def __init__(self):
+    def __init__(self) -> None:
         self.ok = False
         self.next: Dict[H, Node] = {}
 
