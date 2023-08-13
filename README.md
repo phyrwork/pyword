@@ -21,13 +21,13 @@ is defined, and modules for each of the word search games a solver is demonstrat
 
 The following solvers are demonstrated:
 
-| Game                | Command      | Description                                                                                      |
-|---------------------|--------------|--------------------------------------------------------------------------------------------------|
-| Classic word search | linear       | Classic (linear on grid) [word search](https://en.wikipedia.org/wiki/Word_search).               |
-| Boggle              | boggle       | Arbitrary **N**x**M** size Boggle solver with scoring based on standard (4x4) rules.             |
-| NYT Letter Boxed    | letter-boxed | [New York Times Letter Boxed](https://www.nytimes.com/puzzles/letter-boxed) solver.              |
-| NYT Spelling Bee    | spelling-bee | [New York Times Spelling Bee](https://www.nytimes.com/puzzles/spelling-bee) solver with scoring. |
-| Wordiply            | wordiply     | The Guardian [Wordiply](https://www.wordiply.com) solver.                                        |
+| Game                | Command      | Description                                                                                                                  |
+|---------------------|--------------|------------------------------------------------------------------------------------------------------------------------------|
+| Classic word search | linear       | Classic (linear on grid) [word search](https://en.wikipedia.org/wiki/Word_search).                                           |
+| Boggle              | boggle       | Arbitrary **N**x**M** size [Boggle](https://en.wikipedia.org/wiki/Boggle) solver with scoring based on standard (4x4) rules. |
+| NYT Letter Boxed    | letter-boxed | [New York Times Letter Boxed](https://www.nytimes.com/puzzles/letter-boxed) solver.                                          |
+| NYT Spelling Bee    | spelling-bee | [New York Times Spelling Bee](https://www.nytimes.com/puzzles/spelling-bee) solver with scoring.                             |
+| Wordiply            | wordiply     | The Guardian [Wordiply](https://www.wordiply.com) solver.                                                                    |
 
 
 ## Usage
