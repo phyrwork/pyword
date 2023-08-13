@@ -21,12 +21,13 @@ is defined, and modules for each of the word search games a solver is demonstrat
 
 The following solvers are demonstrated:
 
-| Game             | Command      | Description                                                                                      |
-|------------------|--------------|--------------------------------------------------------------------------------------------------|
-| Boggle           | boggle       | Arbitrary **N**x**M** size Boggle solver with scoring based on standard (4x4) rules.             |
-| NYT Letter Boxed | letter-boxed | [New York Times Letter Boxed](https://www.nytimes.com/puzzles/letter-boxed) solver.              |
-| NYT Spelling Bee | spelling-bee | [New York Times Spelling Bee](https://www.nytimes.com/puzzles/spelling-bee) solver with scoring. |
-| Wordiply         | wordiply     | The Guardian [Wordiply](https://www.wordiply.com) solver.                                        |
+| Game                | Command      | Description                                                                                      |
+|---------------------|--------------|--------------------------------------------------------------------------------------------------|
+| Classic word search | linear       | Classic (linear on grid) [word search](https://en.wikipedia.org/wiki/Word_search).               |
+| Boggle              | boggle       | Arbitrary **N**x**M** size Boggle solver with scoring based on standard (4x4) rules.             |
+| NYT Letter Boxed    | letter-boxed | [New York Times Letter Boxed](https://www.nytimes.com/puzzles/letter-boxed) solver.              |
+| NYT Spelling Bee    | spelling-bee | [New York Times Spelling Bee](https://www.nytimes.com/puzzles/spelling-bee) solver with scoring. |
+| Wordiply            | wordiply     | The Guardian [Wordiply](https://www.wordiply.com) solver.                                        |
 
 
 ## Usage
@@ -51,6 +52,38 @@ A path to a dictionary file of line separated words must be provided either as t
 or `-d` option or as the `PYWORD_DICTIONARY` environment variable.
 
 Unix-like systems often have a word list at `/usr/share/dict/words`.
+
+
+### Classic word search
+
+Provide each row of characters as a positional argument.
+
+For example give the grid
+
+```text
+a s k l
+p e i o
+e h l a
+s i q d
+```
+
+as
+
+```shell
+$ linear askl peio ehla siqd
+loading dictionary... ok (194433 words, 447873 nodes)
+qi ((3, 2), (3, 1))
+is ((3, 1), (3, 0))
+he ((2, 1), (2, 0))
+hi ((2, 1), (3, 1))
+he ((2, 1), (1, 1))
+hi ((2, 1), (1, 2))
+ok ((1, 3), (0, 2))
+load ((0, 3), (1, 3), (2, 3), (3, 3))
+ape ((0, 0), (1, 0), (2, 0))
+apes ((0, 0), (1, 0), (2, 0), (3, 0))
+ask ((0, 0), (0, 1), (0, 2))
+```
 
 
 ### Boggle

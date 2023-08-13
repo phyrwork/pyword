@@ -23,6 +23,7 @@ spelling-bee = "pyword.spelling_bee:cli"
 boggle = "pyword.boggle:cli"
 wordiply = "pyword.wordiply:cli"
 letter-boxed = "pyword.letter_boxed:cli"
+linear = "pyword.linear:cli"
 
 [tool.isort]
 profile = "black"
