@@ -17,7 +17,7 @@ from typing import (
 
 import click
 
-from pyword.trie import Node
+from . import trie
 
 # TODO: Possible culprit for high memory use by storing duplicates rather than using a
 #  handle. Need a FrozenSet that hashes by id().
@@ -33,8 +33,8 @@ class Word(Tuple[Tuple[Edge, str], ...]):
 
 
 class EdgeSet(FrozenSet[Edge]):
-    def words(self, dct: Node[str]) -> Iterator[Word]:
-        todo: List[Tuple[Node[str], Word]] = []
+    def words(self, dct: trie.Node[str]) -> Iterator[Word]:
+        todo: List[Tuple[trie.Node[str], Word]] = []
         for char, v in dct.next.items():
             for next in self:
                 if char in next:
@@ -64,7 +64,7 @@ def find_adj(words: Set[Word]) -> Dict[Word, Set[Word]]:
 
 
 def solve(
-    dct: Node[str], edges: EdgeSet, max_words: int, max_solutions: int
+    dct: trie.Node[str], edges: EdgeSet, max_words: int, max_solutions: int
 ) -> Iterator[Tuple[Word, ...]]:
     if max_words == 0:
         return
@@ -122,7 +122,7 @@ def solve(
 
 
 def solves(
-    dct: Node[str], edges: EdgeSet, max_words: int, max_solutions: int
+    dct: trie.Node[str], edges: EdgeSet, max_words: int, max_solutions: int
 ) -> Iterator[Tuple[str, ...]]:
     seen: Set[Tuple[str, ...]] = set()
     for words in solve(dct, edges, max_words, max_solutions):
@@ -146,7 +146,7 @@ def cli(
         raise Exception("no dictionary provided")
 
     print("loading dictionary...", end="", file=sys.stderr, flush=True)
-    dct = Node.from_keys(map(str.strip, dct_file))
+    dct = trie.Node.from_keys(map(str.strip, dct_file))
     print(f" ok ({len(dct)} words, {dct.size()} nodes)", file=sys.stderr, flush=True)
 
     for words in solves(

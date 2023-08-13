@@ -2,8 +2,8 @@ from typing import Iterable, Mapping
 
 from pytest import mark, param
 
-from .spelling_bee import solve
-from .trie import Node
+from . import spelling_bee as sb
+from . import trie
 
 
 @mark.parametrize(
@@ -45,4 +45,4 @@ def test_solve(
     required: Iterable[str],
     want: Mapping[str, int],
 ) -> None:
-    assert dict(solve(Node.from_keys(dct), optional, required)) == want
+    assert dict(sb.solve(trie.Node.from_keys(dct), optional, required)) == want

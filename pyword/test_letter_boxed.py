@@ -1,4 +1,5 @@
 from . import letter_boxed as lb
+from . import trie
 
 
 class TestPath:
@@ -30,7 +31,7 @@ class TestEdgeSet:
         a = frozenset(("h", "t", "i"))
         b = frozenset(("i", "a", "t"))
 
-        dct = lb.Node.from_keys(
+        dct = trie.Node.from_keys(
             (
                 "it",
                 "hit",
@@ -57,7 +58,7 @@ class TestEdgeSet:
 
 
 def test_solves() -> None:
-    dct = lb.Node.from_keys(
+    dct = trie.Node.from_keys(
         ("hit", "ton", "none", "hi", "it", "on", "to", "non", "one")
     )
     edges = lb.EdgeSet((frozenset(("h", "t", "n")), frozenset(("i", "o", "e"))))

@@ -3,7 +3,7 @@ from typing import Dict, Iterator, List, MutableMapping, Optional, TextIO, Tuple
 
 import click
 
-from .trie import Node
+from . import trie
 
 
 class TokenError(Exception):
@@ -66,9 +66,9 @@ class Grid(MutableMapping[Tuple[int, int], str]):
 Path = Tuple[Tuple[int, int], ...]
 
 
-def solve(dct: Node[str], g: Grid) -> Iterator[Tuple[Tuple[str, ...], Path]]:
+def solve(dct: trie.Node[str], g: Grid) -> Iterator[Tuple[Tuple[str, ...], Path]]:
     # Seed search with words starting with chars at each grid position.
-    s: List[Tuple[Path, Node]] = [
+    s: List[Tuple[Path, trie.Node]] = [
         ((c,), u) for c in g if (u := dct.next.get(g[c])) is not None
     ]
     while s:
@@ -117,7 +117,7 @@ def cli(dictionary: Optional[TextIO], rows: List[str]) -> None:
 
     print("loading dictionary...", end="", file=sys.stderr, flush=True)
     ignored = 0
-    dct: Node[str] = Node()
+    dct: trie.Node[str] = trie.Node()
     for word in dictionary:
         word = word.strip().lower()
         try:

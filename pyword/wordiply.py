@@ -17,8 +17,8 @@ def join(letters: Iterable[str]) -> str:
 
 
 def containing(dct: trie.Node[str], key: str) -> Iterator[str]:
-    for prefix, node in dct.search(key):
-        yield from map(lambda suffix: join((*prefix, *key, *suffix)), node)
+    for seq, node in dct.search(key):
+        yield from map(lambda suffix: join((*seq, *suffix)), node.keys())
 
 
 def solve(dct: trie.Node[str], contains: str, count: int = 5) -> Tuple[str, ...]:

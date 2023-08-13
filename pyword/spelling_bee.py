@@ -3,11 +3,11 @@ from typing import Iterable, Iterator, List, Optional, TextIO, Tuple
 
 import click
 
-from .trie import Node
+from . import trie
 
 
 def solve(
-    dct: Node[str], optional: Iterable[str], required: Iterable[str] = ""
+    dct: trie.Node[str], optional: Iterable[str], required: Iterable[str] = ""
 ) -> Iterator[Tuple[str, int]]:
     if not isinstance(optional, set):
         optional = set(optional)
@@ -40,8 +40,8 @@ def solve(
         return p
 
     # Seed search with words starting with any char from list.
-    s: List[Tuple[str, Node]] = [  # type: ignore
-        (c, u) for c in optional if (u := dct.next.get(c)) is not None
+    s: List[Tuple[str, trie.Node[str]]] = [
+        (c, u) for c in optional if (u := dct.next.get(c))
     ]
     while s:
         w, u = s.pop()
@@ -68,7 +68,7 @@ def cli(dictionary: Optional[TextIO], optional: str, required: str) -> None:
         raise Exception("no dictionary provided")
 
     print("loading dictionary...", end="", file=sys.stderr, flush=True)
-    dct = Node.from_keys(iter_strip(dictionary))
+    dct = trie.Node.from_keys(iter_strip(dictionary))
     print(f" ok ({len(dct)} words, {dct.size()} nodes)", file=sys.stderr, flush=True)
 
     result = sorted(
