@@ -71,24 +71,20 @@ ORIENTATIONS: Set[YX] = {
 
 
 def solve(dct: trie.Node, grid: Grid) -> Iterator[Word]:
-    seen: Set[Word] = set()
-
     todo: List[Tuple[trie.Node, YX, Word]] = []
     for yx0, char0 in grid.items():
         if (v := dct.next.get(char0)) is not None:
-            for dyx in ORIENTATIONS:
-                todo.append((v, dyx, (yx0,)))
+            todo.append((v, (0, 0), (yx0,)))
     while todo:
         u, dyx, path = todo.pop()
         if u.ok:
-            if path not in seen:
-                yield path
-                seen.add(path)
+            yield path
         yx0 = path[-1]
-        yx1 = yx_add(yx0, dyx)
-        if char1 := grid.get(yx1):
-            if (v := u.next.get(char1)) is not None:
-                todo.append((v, dyx, (*path, yx1)))
+        for dyx in ORIENTATIONS if len(path) == 1 else {dyx}:  # noqa: B020
+            yx1 = yx_add(yx0, dyx)
+            if char1 := grid.get(yx1):
+                if (v := u.next.get(char1)) is not None:
+                    todo.append((v, dyx, (*path, yx1)))
 
 
 @click.command()
